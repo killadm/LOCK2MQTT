@@ -7,6 +7,8 @@
 
 ## 特性
 
+
+
 - 门锁状态
 
   - 开门
@@ -15,7 +17,6 @@
   - 敲门
   - 撬门
   - 门卡住
-
 - 锁舌状态
 
   - 所有锁舌收回
@@ -23,7 +24,6 @@
   - 方舌/斜舌弹出
   - 呆舌/斜舌弹出
   - 所有锁舌弹出
-
 - 开锁事件
 
   - 方法
@@ -51,7 +51,6 @@
     - 关闭童锁
 
   - 操作者
-
 - 报警事件
 
   - 密码多次验证失败
@@ -64,14 +63,11 @@
   - 钥匙未取出
   - NFC设备多次验证失败
   - 超时未按要求上锁
-
 - 电量事件
-
 - WIFIManager配网
-
 - MQTT输出
-
 - OTA在线升级
+- 远程调试信息输出
 
 ## 原理
 
@@ -84,12 +80,12 @@
 
   ![图片](https://raw.githubusercontent.com/killadm/LOCK2MQTT/master/DOC/images/%E7%B1%B3%E5%AE%B6%E6%99%BA%E8%83%BD%E9%94%81.jpg)
 
-- - **小白万能遥控器 声控版** x 1
+- **小白万能遥控器 声控版** x 1
 
   ![图片](https://raw.githubusercontent.com/killadm/LOCK2MQTT/master/DOC/images/%E5%B0%8F%E7%99%BD%E4%B8%87%E8%83%BD%E9%81%A5%E6%8E%A7%E5%99%A8%E5%A3%B0%E6%8E%A7%E7%89%88.jpg)
 
 - **ESP8266** x 1
-![图片](https://raw.githubusercontent.com/killadm/LOCK2MQTT/master/DOC/images/esp8266.png)
+![图片](https://raw.githubusercontent.com/killadm/LOCK2MQTT/master/DOC/images/nodemcu.jpg)
 
 ## 烧录
 
@@ -100,7 +96,13 @@
 因网关串口输出非常频繁，为了提高效率，默认使用ESP8266的硬串口。
 调试完成后，可以通过网关PCB上的VBUS触点给ESP8266供电。
 
+-  **网关端**
+
 ![图片](https://raw.githubusercontent.com/killadm/LOCK2MQTT/master/DOC/images/%E6%8E%A5%E7%BA%BF%E5%9B%BE.jpg)
+
+- **ESP8266端**
+
+![图片](https://raw.githubusercontent.com/killadm/LOCK2MQTT/master/DOC/images/esp8266.png)
 
 ## 配网
 
