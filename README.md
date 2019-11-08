@@ -1,7 +1,7 @@
 # LOCK2MQTT
 米家智能门锁接入homeassistant
 
-![](https://i.loli.net/2019/11/08/9uR5Eso1tadFBIh.jpg)
+![](https://raw.githubusercontent.com/killadm/LOCK2MQTT/master/DOC/images/ha.jpg)
 
 
 
@@ -9,61 +9,61 @@
 
 - 门锁状态
 
-  > 开门
-  > 关门
-  > 超时未关
-  > 敲门
-  > 撬门
-  > 门卡住
+  - 开门
+  - 关门
+  - 超时未关
+  - 敲门
+  - 撬门
+  - 门卡住
 
 - 锁舌状态
 
-  > 所有锁舌收回
-  > 斜舌弹出
-  > 方舌/斜舌弹出
-  > 呆舌/斜舌弹出
-  > 所有锁舌弹出
+  - 所有锁舌收回
+  - 斜舌弹出
+  - 方舌/斜舌弹出
+  - 呆舌/斜舌弹出
+  - 所有锁舌弹出
 
 - 开锁事件
 
   - 方法
 
-    > 蓝牙
-    > 密码
-    > 指纹
-    > 应急钥匙
-    > 转盘方式
-    > NFC
-    > 一次性密码
-    > 双重验证
-    > 人工
-    > 自动
+    - 蓝牙
+    - 密码
+    - 指纹
+    - 应急钥匙
+    - 转盘方式
+    - NFC
+    - 一次性密码
+    - 双重验证
+    - 人工
+    - 自动
 
   - 动作
 
-    > 室外开门
-    > 上提把手锁门
-    > 反锁
-    > 解除反锁
-    > 室内开门
-    > 门内上锁
-    > 开启童锁
-    > 关闭童锁
+    - 室外开门
+    - 上提把手锁门
+    - 反锁
+    - 解除反锁
+    - 室内开门
+    - 门内上锁
+    - 开启童锁
+    - 关闭童锁
 
   - 操作者
 
 - 报警事件
 
-  > 密码多次验证失败
-  > 指纹多次验证失败
-  > 密码输入超时
-  > 撬锁
-  > 重置按键按下
-  > 有人撬锁或钥匙未拔
-  > 钥匙孔异物
-  > 钥匙未取出
-  > NFC设备多次验证失败
-  > 超时未按要求上锁
+  - 密码多次验证失败
+  - 指纹多次验证失败
+  - 密码输入超时
+  - 撬锁
+  - 重置按键按下
+  - 有人撬锁或钥匙未拔
+  - 钥匙孔异物
+  - 钥匙未取出
+  - NFC设备多次验证失败
+  - 超时未按要求上锁
 
 - 电量事件
 
@@ -82,14 +82,14 @@
 
 - **米家智能门锁** x 1
 
-  ![图片]()
+  ![图片](https://raw.githubusercontent.com/killadm/LOCK2MQTT/master/DOC/images/%E7%B1%B3%E5%AE%B6%E6%99%BA%E8%83%BD%E9%94%81.jpg)
 
 - - **小白万能遥控器 声控版** x 1
 
-  ![图片]()
+  ![图片](https://raw.githubusercontent.com/killadm/LOCK2MQTT/master/DOC/images/%E5%B0%8F%E7%99%BD%E4%B8%87%E8%83%BD%E9%81%A5%E6%8E%A7%E5%99%A8%E5%A3%B0%E6%8E%A7%E7%89%88.jpg)
 
 - **ESP8266** x 1
-![图片]()
+![图片](https://raw.githubusercontent.com/killadm/LOCK2MQTT/master/DOC/images/esp8266.png)
 
 ## 烧录
 
@@ -99,7 +99,8 @@
 
 因网关串口输出非常频繁，为了提高效率，默认使用ESP8266的硬串口。
 调试完成后，可以通过网关PCB上的VBUS触点给ESP8266供电。
-![图片]()
+
+![图片](https://raw.githubusercontent.com/killadm/LOCK2MQTT/master/DOC/images/%E6%8E%A5%E7%BA%BF%E5%9B%BE.jpg)
 
 ## 配网
 
