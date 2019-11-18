@@ -1,0 +1,108 @@
+binary_sensor:
+  - platform: mqtt
+    name: mijia_lock
+    state_topic: 'LOCK2MQTT/lock/state'
+    payload_on: 'unlock'
+    payload_off: 'lock'
+    device_class: lock
+    qos: 1
+sensor:
+  - platform: mqtt
+    name: lock_state
+    icon: 'mdi:lock-smart'
+    state_topic: 'LOCK2MQTT/state'
+    value_template: '{{value_json.state}}'
+  - platform: mqtt
+    name: lock_state_update_time
+    icon: 'mdi:lock-clock'
+    state_topic: 'LOCK2MQTT/state'
+    value_template: '{{value_json.time}}'
+  - platform: mqtt
+    name: lock_event
+    icon: 'mdi:lock-question'
+    state_topic: 'LOCK2MQTT/event'
+    value_template: '{{value_json.event}}'
+
+    #可以按照下边的格式匹配操作者
+  - platform: mqtt
+    name: lock_user
+    icon: 'mdi:account-lock'
+    state_topic: 'LOCK2MQTT/event'
+    value_template: >-
+       {% if value_json.key == '00000000' or value_json.key == '01000180' or value_json.key == '02000180' %}
+         我
+       {% elif value_json.key == '03000180' %}
+         老婆
+       {% elif value_json.key == '06000180' %}
+         儿子
+       {% elif value_json.key == 'ffffffff' %}
+         未知操作者
+       {% else %}
+         无效操作者
+       {% endif %}
+  - platform: mqtt
+    name: lock_event_update_time
+    icon: 'mdi:lock-clock'
+    state_topic: 'LOCK2MQTT/event'
+    value_template: '{{value_json.time}}'
+  - platform: mqtt
+    name: lock_alert
+    icon: 'mdi:lock-alert'
+    state_topic: 'LOCK2MQTT/alert'
+    value_template: '{{value_json.alert}}'
+  - platform: mqtt
+    name: lock_alert_update_time
+    icon: 'mdi:lock-clock'
+    state_topic: 'LOCK2MQTT/alert'
+    value_template: '{{value_json.time}}'
+  - platform: mqtt
+    name: bolt_state
+    icon: 'mdi:lock-open-variant'
+    state_topic: 'LOCK2MQTT/bolt'
+    value_template: '{{value_json.state}}'
+  - platform: mqtt
+    name: lock_battery
+    state_topic: 'LOCK2MQTT/battery'
+    value_template: '{{value_json.power}}'
+    unit_of_measurement: '%'
+    device_class: battery
+
+
+homeassistant:
+  customize:
+    binary_sensor.mijia_lock:
+      friendly_name: 米家智能锁
+    sensor.lock_state:
+      friendly_name: 门锁状态
+    sensor.lock_state_update_time:
+      friendly_name: 状态变更时间
+    sensor.lock_event:
+      friendly_name: 门锁事件
+    sensor.lock_user:
+      friendly_name: 操作者
+    sensor.lock_event_update_time:
+      friendly_name: 事件发生时间
+    sensor.lock_alert:
+      friendly_name: 警告信息
+    sensor.lock_alert_update_time:
+      friendly_name: 警告发生时间
+    sensor.bolt_state:
+      friendly_name: 锁舌状态
+    sensor.lock_battery:
+      friendly_name: 电池电量
+
+group:
+  mijia_lock:
+    name: 米家智能锁
+    view: no
+    entities:
+      - binary_sensor.mijia_lock
+      - sensor.lock_state
+      - sensor.lock_state_update_time
+      - sensor.lock_event
+      - sensor.lock_user
+      - sensor.lock_event_update_time
+      - sensor.lock_alert
+      - sensor.lock_alert_update_time
+      - sensor.bolt_state
+      - sensor.lock_battery

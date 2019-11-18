@@ -85,11 +85,16 @@
   ![图片](https://raw.githubusercontent.com/killadm/LOCK2MQTT/master/DOC/images/%E5%B0%8F%E7%99%BD%E4%B8%87%E8%83%BD%E9%81%A5%E6%8E%A7%E5%99%A8%E5%A3%B0%E6%8E%A7%E7%89%88.jpg)
 
 - **ESP8266** x 1
+
 ![图片](https://raw.githubusercontent.com/killadm/LOCK2MQTT/master/DOC/images/nodemcu.jpg)
+
+## 编译
+
+待填坑
 
 ## 烧录
 
-待更新
+待填坑
 
 ## 接线
 
@@ -106,11 +111,18 @@
 
 ## 配网
 
-待更新
+通电后，连接SSID为"LOCK2MQTT_****"的无线，稍后会弹出认证页面（如果没有弹出，手动访问http://192.168.4.1）
 
-## 接入homeassistant
+![图片](https://raw.githubusercontent.com/killadm/LOCK2MQTT/master/DOC/images/WIFIManager.jpg)
 
-待更新
+点击“配置WIFI (扫描)”，选择对应的wifi名称，按照提示输入wifi密码及mqtt服务器信息，确定之后等待几秒，配网成功。
+
+## 接入HomeAssistant
+
+将项目中的LOCK2MQTT放入packages文件夹，重启ha
+
+待填坑
+
 
 ## 致谢
 
