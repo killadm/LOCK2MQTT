@@ -123,6 +123,46 @@
 
 待填坑
 
+**如何匹配操作者**
+操作者是通过key来匹配的，key 的后六位都一样（我这是000180，不知道是不是每个人的都一样），正常情况下配置完门锁之后00000000、01000180、02000180分别为管理员、管理员密码、管理员指纹，之后新增的指纹、密码等key的前两位会按顺序递增。
+你也可以通过订阅LOCK2MQTT/event主题来获取相应操作者的key。
+拿到key之后打开lock.yaml，搜索“我”，按下边的格式增加就行了。
+
+```
+  - platform: mqtt
+    name: lock_user
+    icon: 'mdi:account-lock'
+    state_topic: 'LOCK2MQTT/event'
+    value_template: >-
+       {% if value_json.key == '00000000' or value_json.key == '01000180' or value_json.key == '02000180' %}
+         我
+       {% elif value_json.key == '03000180' %}
+         老婆
+       {% elif value_json.key == '新操作者key' %}
+         新操作者
+       {% elif value_json.key == 'ffffffff' %}
+         未知操作者
+       {% else %}
+         无效操作者
+       {% endif %}
+```
+
+
+## 进阶-解决ESP8266供电
+
+如果你用的是nodemcu开发板，可以通过连接开发板和网关的VIN-VBUS、GND-GND来实现供电。
+
+为了能够放入网关外壳，我用了[huex](https://github.com/huexpub/)大佬的IRMQTT板子来做LOCK2MQTT主控板，当然你也可以自己画。
+
+下载[gerber](https://github.com/killadm/LOCK2MQTT/raw/master/gerber.zip)文件，去嘉立创薅5块钱5片的羊毛，然后按下图贴好元件（AMS1117是SOT-89，电容电阻是0603），插好排针。
+
+![图片](https://github.com/killadm/LOCK2MQTT/raw/master/DOC/images/%E8%B4%B4%E7%89%87.jpg)
+
+烧录时需要短接正面（有esp-12f的那面）的Fp触点。
+
+烧录成功之后，按下图接线，并把板子卡在相应位置，测试正常之后，就可以把盖子装回去了。
+
+![](https://github.com/killadm/LOCK2MQTT/raw/master/DOC/images/esp8266%E4%BE%9B%E7%94%B5.jpg)
 
 ## 致谢
 
