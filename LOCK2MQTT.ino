@@ -99,7 +99,7 @@ void save_wifi_config_callback () {
 void setup_ota() {
     httpUpdater.setup(&httpServer, update_path, update_username, update_password);
     httpServer.begin();
-    Serial.printf("HTTPUpdateServer ready! Open http://%s.local%s in your browser and login with username '%s' and password '%s'\n", host, update_path, update_username, update_password);
+    //Serial.printf("HTTPUpdateServer ready! Open http://%s.local%s in your browser and login with username '%s' and password '%s'\n", host, update_path, update_username, update_password);
 }
 
 void setup_mdns() {
@@ -283,7 +283,7 @@ void parse_json(String json) {
         }
         //电量事件
         if (eid == 4106) {
-            String battery_state = edata.substring(0, 2);
+            String battery_state = String(hex_to_dec(edata.substring(0, 2)));
             String battery_msg = "{\"power\":\"" + battery_state + "\"}";
             mqtt_client.publish("LOCK2MQTT/battery", battery_msg.c_str(), true);
         }

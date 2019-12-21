@@ -119,7 +119,7 @@
 
 ## 接入HomeAssistant
 
-将项目中的LOCK2MQTT放入packages文件夹，重启ha
+将项目中的lock.yaml放入packages文件夹，重启ha
 
 待填坑
 
