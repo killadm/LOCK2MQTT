@@ -64,6 +64,8 @@
   - NFC设备多次验证失败
   - 超时未按要求上锁
 - 电量事件
+- 蓝牙温湿度计接入(主题:LOCK2MQTT/temp/raw，施工中)
+- 网关日志格式化后输出(主题:LOCK2MQTT/json)
 - WIFIManager配网
 - MQTT输出
 - OTA在线升级
@@ -94,7 +96,9 @@
 
 ## 烧录
 
-待填坑
+感谢[astonish921](https://bbs.iobroker.cn/u/astonish921)填坑，这个帖子写的很详细。
+
+https://bbs.iobroker.cn/t/topic/3364
 
 ## 接线
 

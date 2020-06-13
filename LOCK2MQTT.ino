@@ -106,15 +106,15 @@ void setup_mdns() {
     bool mdns_result = MDNS.begin(HOSTNAME);
 }
 
-//获取串口数据中的json
-//匹配{"eid":11,"edata":"a4ffffffffab42a85d"}
+//获取串口数据中含有method字符的json，基本上涵盖了网关状态、红外收发编码、蓝牙事件、指示灯状态等信息
+//我手里没有别的蓝牙设备，没办法抓数据，猜测如果单纯作为蓝牙网关的话只匹配ble_event就够了
 String get_json(String data) {
     MatchState parse_result;
     char match_result[data.length() - 30];
     char buf[data.length() + 1];
     data.toCharArray(buf, data.length() + 1);
     parse_result.Target(buf);
-    if (parse_result.Match("\{\"eid.*edata.*\"\}") == REGEXP_MATCHED) {
+    if (parse_result.Match("\{.*method.*\}") == REGEXP_MATCHED) {
       return String(parse_result.GetMatch(match_result));
     }
     else {
@@ -130,10 +130,12 @@ int hex_to_int(String paload) {
 }
 
 String hex_to_time(String hex_timestamp) {
+  
     //不懂位运算，用字符串简单粗暴解决
     String str = hex_timestamp.substring(6, 8) + hex_timestamp.substring(4, 6) + hex_timestamp.substring(2, 4) + hex_timestamp.substring(0, 2);
     unsigned long timestamp = hex_to_dec(str) + 3600 * TIME_ZONE;
     char time[32];
+    
     //把时间戳格式化成yyyy-mm-dd hh:mm:ss
     sprintf(time, "%02d-%02d-%02d %02d:%02d:%02d", year(timestamp), month(timestamp), day(timestamp), hour(timestamp), minute(timestamp), second(timestamp));
     return time;
@@ -155,14 +157,23 @@ unsigned int hex_to_dec(String hexString) {
 }
 
 void parse_json(String json) {
+  
+    //米家智能锁的json类似这样：{"id":1518998071,"method":"_async.ble_event","params":{"dev":{"did":"1011078646","mac":"AA:BB:CC:DD:EE:FF","pdid":794},"evt":[{"eid":7,"edata":"0036f6e45e"}],"frmCnt":97,"gwts":2362}}
+    //状态信息在这里：{"eid":7,"edata":"0036f6e45e"}
     char buf[json.length() + 1];
     json.toCharArray(buf, json.length() + 1);
-    const size_t capacity = JSON_OBJECT_SIZE(2) + 40;
-    StaticJsonDocument<capacity> doc;
+    StaticJsonDocument<1024> doc;
     DeserializationError error = deserializeJson(doc, buf);
+    JsonObject params = doc["params"];
     if (!error) {
-        int eid = doc["eid"];
-        String edata = doc["edata"];
+
+        //提取eid
+        int eid = params["evt"][0]["eid"];
+
+        //提取edata
+        String edata = params["evt"][0]["edata"];
+
+        //智能锁状态
         if (eid == 7) {
             String lock_state = edata.substring(0, 2);
             String time = hex_to_time(edata.substring(2, 10));
@@ -189,6 +200,8 @@ void parse_json(String json) {
               mqtt_client.publish("LOCK2MQTT/lock/state", "lock", true);
             }
         }
+
+        //智能锁事件
         if (eid == 11) {
             String method = edata.substring(0, 1);
             String action = edata.substring(1, 2);
@@ -243,6 +256,8 @@ void parse_json(String json) {
             String msg_raw = "{\"alert\":\"" + alert + "\",\"time\":\"" + String(time) + "\"}";
             Debug.println(msg);
             mqtt_client.publish("LOCK2MQTT/alert", msg.c_str(), true);
+
+            //原始数据，玩nodered可能用得到，不需要的可以注释掉
             mqtt_client.publish("LOCK2MQTT/alert/raw", msg_raw.c_str(), true);
             }
             //判断是否有内部触发的异常
@@ -258,11 +273,14 @@ void parse_json(String json) {
             String msg_raw = "{\"alert\":\"" + alert + "\",\"time\":\"" + String(time) + "\"}";
             Debug.println(msg);
             mqtt_client.publish("LOCK2MQTT/alert", msg.c_str(), true);
+
+            //原始数据，玩nodered可能用得到，不需要的可以注释掉
             mqtt_client.publish("LOCK2MQTT/alert/raw", msg_raw.c_str());
             }
             //无异常输出事件消息
             else {
-
+              
+                // 作废，改由ha端处理
                 // 判断事件操作者
                 // 00000000:锁的管理员
                 // 01000180:第一个密码
@@ -278,16 +296,20 @@ void parse_json(String json) {
                 String msg_raw = "{\"method\":\"" + method + "\",\"action\":\"" + action + "\",\"key\":\"" + key_id + "\",\"time\":\"" + String(time) + "\"}";
                 Debug.println(msg);
                 mqtt_client.publish("LOCK2MQTT/event", msg.c_str(), true);
+
+                //原始数据，玩nodered可能用得到，不需要的可以注释掉
                 mqtt_client.publish("LOCK2MQTT/event/raw", msg_raw.c_str(), true);
             }
         }
-        //电量事件
+        
+        //智能锁电量事件
         if (eid == 4106) {
             String battery_state = String(hex_to_dec(edata.substring(0, 2)));
             String battery_msg = "{\"power\":\"" + battery_state + "\"}";
             mqtt_client.publish("LOCK2MQTT/battery", battery_msg.c_str(), true);
         }
-        //锁舌事件
+        
+        //智能锁锁舌事件
         if (eid == 4110) {
             String bolt_state = "";
             switch(hex_to_int(edata)) {
@@ -301,8 +323,20 @@ void parse_json(String json) {
             String bolt_state_msg = "{\"state\":\"" + bolt_state + "\"}";
             String bolt_state_msg_raw = "{\"state\":\"" + edata + "\"}";
             mqtt_client.publish("LOCK2MQTT/bolt", bolt_state_msg.c_str(), true);
+
+            //原始数据，玩nodered可能用得到，不需要的可以注释掉
             mqtt_client.publish("LOCK2MQTT/bolt/raw", bolt_state_msg_raw.c_str(), true);
             Debug.println(bolt_state_msg.c_str());
+        }
+
+        //貌似是温湿度计，一种是圆的一种是方的
+        //尝试发送一下
+        if (eid == 4102 || eid == 4109) {
+            String temp_msg_raw = "{\"eid\":\"" + String(eid) + "\",\"state\":\"" + edata + "\"}";
+
+            //具体啥格式咱也不清楚，原样发出去给玩nodered的大神们
+            //看完nodered流后猜测edata前半部分是温度，后半部分是湿度，高低位互换后再hex2dec，如果能确定的话，可以在这里处理
+            mqtt_client.publish("LOCK2MQTT/temp/raw", temp_msg_raw.c_str(), true);
         }
     }
     else {
@@ -316,8 +350,15 @@ void mqtt_publish(String topic, String payload,boolean retained) {
 }
 
 void setup() {
-
-    Serial.begin(115200);
+    //尝试解决串口乱码
+    //关闭串口输出
+    Serial.begin(115200, SERIAL_8N1, SERIAL_RX_ONLY);
+    Serial.setDebugOutput (false);
+    //接收缓冲区增大一倍
+    Serial.setRxBufferSize (512);
+    //超时时间减半
+    Serial.setTimeout(500);
+    
     EEPROM.begin(512);
     Debug.begin("LOCK2MQTT");
     Debug.setResetCmdEnabled(true);
@@ -398,19 +439,23 @@ void loop() {
     }
 
     while (Serial.available()){
-        char c = Serial.read();
-        if (c != '\n'){
-            infoBuffer.concat(String(c));
-        }
-        else {
-            String result = get_json(infoBuffer);
-            if ( result != "UNKNOWN" ){
-                parse_json(result);
-                infoBuffer = "";
-                }
-            else {
-                infoBuffer = "";
+        //只匹配含有method的json
+        String result = get_json(Serial.readStringUntil('\n'));
+        if ( result != "UNKNOWN" ){
+          
+            //处理数据
+            parse_json(result);
+            
+            //通过mqtt发送原始json数据，玩nodered的朋友应该用得上
+            //PubSubClient缓冲区大小有限制，有些数据可以在日志里看到但是发送不出去
+            //超长的数据基本上没啥用，如果想要的话可以通过修改PubSubClient增大缓冲区解决
+            mqtt_client.publish("LOCK2MQTT/json", result.c_str(), false);
+            
+            //telnet到8266的ip可以查看日志
+            Debug.println(result);
             }
+        else {
+            //Debug.println("UNKNOWN");
         }
     }
 }
